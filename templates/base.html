@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>tinyQuiz</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/reset.css') }}" />
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style_new.css') }}" />
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <div class="table">
+    <div class="table-cell">
+        <div id="top">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" />
+            <h1>tinyQuiz</h1><br>
+            <h2>{% block h2 %}{% endblock %}</h2>
+        </div>
+
+        <div id="middle">
+            <!--<h3>{% block h3 %}{% endblock %}</h3>-->
+            {% block middle %}{% endblock %}
+        </div>
+
+        <div id="bottom">
+        {% block bottom %} {% endblock %}
+        </div>
+    </div>
+    </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.2.1.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+          setTimeout(function () {
+
+                $('a[href].no-link').each(function () {
+                    var href = this.href;
+
+                    $(this).removeAttr('href').css('cursor', 'pointer').click(function () {
+                        if (href.toLowerCase().indexOf("#") >= 0) {
+
+                        } else {
+                            window.open(href, '_self');
+                        }
+                    });
+                });
+
+          }, 500);
+        });
+    </script>
+    {% block script1 %}{% endblock %}
+    {% block script2 %}{% endblock %}
+
+
+</body>
+
+</html>
+

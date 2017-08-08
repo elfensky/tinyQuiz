@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block h2 %} developed by Andrei Lavrenov © all rights reserved {% endblock %}
+
+{% block head %}
+<style>
+    input {
+        padding: 12px 12px;
+        border: none;
+        border-radius: 10px;
+        background-color: #eee;
+        width: 275px;
+        margin-bottom: 1em;
+    }
+
+    #submit{
+        width: 300px;
+        background-color: #75AA28;
+        padding: 16px 12px;
+    }
+
+    #submit:active {
+        background-color: #BB1041;
+    }
+
+    #bottom a:visited{
+        color:blue;
+    }
+</style>
+{% endblock %}
+
+{% block bottom %}
+    <form action="" method="POST">
+      <input type="text" name="username" placeholder="username" value="{{request.form.username}}">
+      <br>
+      <input type="password" name="password" placeholder="password" value="{{request.form.password}}">
+      <br>
+      <input id="submit" type="submit" value="Login">
+    </form>
+
+    <br>
+    <a href="{{url_for('registration')}}">Don't have an account? Sign up</a>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes style="position: relative; top: -225px; color:red;">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+{% endblock %}
+
+{% block script1 %}
+    <script>
+        document.getElementById(%password%).value = ""
+    </script>
+{% endblock %}
