@@ -39,7 +39,7 @@ def login():
             user = mySQL().getDataFromCustomRow('tblusers', 'username', attempted_username)
 
             if not user:
-                error="This user does not exist. Please try again."
+                error="This user dSoes not exist. Please try again."
                 flash(error)
             else:
                 if password == user[0][2]:
