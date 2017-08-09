@@ -4,6 +4,10 @@
 
 {% block head %}
 <style>
+    .table{
+        height: 460px;
+        margin-top:-200px;
+    }
     input {
         padding: 12px 12px;
         border: none;
@@ -17,6 +21,8 @@
         width: 300px;
         background-color: #BB1041;
         padding: 16px 12px;
+        color:white;
+        font-size:1em;
     }
 
     #submit:active {
@@ -33,7 +39,9 @@
     <form method="post">
       <input type="text" name="username" placeholder="username" value="{{request.form.username}}">
       <br>
-      <input type="password" name="password" placeholder="password" value="{{request.form.password}}">
+      <input type="password" name="password1" placeholder="password" value="{{request.form.password1}}">
+      <br>
+      <input type="password" name="password2" placeholder=" repeat password" value="{{request.form.password2}}">
       <br>
       <input id="submit" type="submit" value="Register">
     </form>
@@ -42,7 +50,7 @@
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul class=flashes style="position: relative; top: -225px; color:red;">
+        <ul class=flashes style="position: relative; top: -290px; color:red;">
         {% for message in messages %}
           <li>{{ message }}</li>
         {% endfor %}
