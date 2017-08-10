@@ -1,9 +1,30 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, session
 from dbClass import mySQL
 from flask_hashing import Hashing
+# from passlib.hash import sha256_crypt #need to change the password system to use this instead
+from functools import wraps #neccesary to have "login required" pages protected against access
+import gc #garbage collection to make sure stuff is cleaned up after mySQL stuff. Has mem leaks
 
 app = Flask(__name__)
 hashing = Hashing(app)
+
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash("you need to login first")
+            return redirect(url_for('index'))
+    return wrap
+
+@app.route("/logout/")
+@login_required
+def logout():
+    session.clear()
+    flash("You have been logged out!")
+    gc.collect()
+    return redirect(url_for('index'))
 
 @app.route('/', methods=['GET','POST'])
 def index():
@@ -14,18 +35,22 @@ def index():
             password = hashing.hash_value(attempted_password, salt='6825')
 
             user = mySQL().getDataFromCustomRow('tblusers', 'username', attempted_username)
-            # session['uid'] = user[0][0]
+
 
             if not user:
-                error="This user dSoes not exist. Please try again."
+                error="This user does not exist. Please try again."
                 flash(error)
             else:
                 if password == user[0][2]:
+                    session['logged_in'] = True
+                    session['username'] = attempted_username
+                    session['uid'] = user[0][0]
                     return redirect(url_for('quiz'))
                 else:
                     error="Wrong password. Please try again."
                     flash(error)
 
+        gc.collect()
         return render_template("index.html")
 
     except Exception as e:
@@ -34,7 +59,7 @@ def index():
 
     return render_template('index.html')
 
-@app.route('/registration/')
+@app.route('/registration/', methods=['GET','POST'])
 def registration():
     try:
         if request.method == "POST":
@@ -44,8 +69,6 @@ def registration():
             password = hashing.hash_value(attempted_password1, salt='6825')
 
             user = mySQL().getDataFromCustomRow('tblusers', 'username', attempted_username)
-            print("attempted username: " + attempted_username)
-            # print("value of user list: " + str(user))
             if attempted_username == '':
                 error = "Please enter a username"
                 flash(error)
@@ -62,11 +85,14 @@ def registration():
                             error = "Passwords do not match."
                             flash(error)
                         else:
+                            session['logged_in'] = True
+                            session['username'] = attempted_username
+                            session['uid'] = user[0][0]
                             error = "you have successfully registered."
                             flash(error)
                             mySQL().setLoginDataToDatabase('tblusers', attempted_username, password)
                             return redirect(url_for('quiz'))
-
+        gc.collect()
         return render_template("registration.html")
 
     except Exception as e:
@@ -76,46 +102,30 @@ def registration():
     return render_template('registration.html.html')
 
 @app.route('/quiz/')
+@login_required
 def quiz():
+    print(session['logged_in'])
+    print(session['username'])
+    print(session['uid'])
     dirty_category = mySQL().getDataFromCustomColumn('description', 'tblcategories')
     cleaned_category = [i[0] for i in dirty_category]
     return render_template('quiz.html', tuple_category=cleaned_category)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.errorhandler(403)
-def forbidden():
+def forbidden(e):
     return render_template("403.html")
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(e):
     return render_template("404.html")
 @app.errorhandler(405)
-def method_not_found():
+def method_not_found(e):
     return render_template("405.html")
 @app.errorhandler(500)
-def method_not_found():
-    return render_template("500.html")
+def internal_server_error(e):
+    return render_template("500.html", e=e)
 
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-
-
-    # app.debug = True
     app.run()
 

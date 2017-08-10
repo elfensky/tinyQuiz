@@ -27,14 +27,6 @@
         color:blue;
     }
 </style>
-
-<script type="javascript">
-    function clear()
-    {
-        alert("HEY");
-        document.getElementById('password').setAttribute('value', '');
-    }
-</script>
 {% endblock %}
 
 {% block bottom %}
@@ -43,7 +35,7 @@
       <br>
       <input id="password" type="password" name="password" placeholder="password" value="{{request.form.password}}">
       <br>
-      <input id="submit" type="submit" value="Login" onclick="clear();">
+      <input id="submit" type="submit" value="Login">
     </form>
 
     <br>
