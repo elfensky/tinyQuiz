@@ -1,28 +1,25 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 
-
-{% block h2 %} developed by Andrei Lavrenov © all rights reserved {% endblock %}
-{% block h3 %} Which category do you want to play? {% endblock %}
-{% block head %}
-<style>
-        a{
-            background-color: #75AA28;
-            margin: 5px;
-            padding: 10px 20px;
-            color:#FFF;
-            border-radius: 10px;
-        }
-
-        a:hover{
-            background-color: #BB1041;
-        }
-</style>
-{% endblock %}
-{% block bottom %}
-
-    {% for row in tuple_category %}
-        <a href="{{url_for('quiz', category=row, id=0)}}">{{ row }}</a><br><br><br>
-    {% endfor %}
-
+{% block slider %}
+    <li><div class="table"><div class="tablecell active"><a href="#" class=""><i class="icon-gamepad"></i>Play</a></div></div></li>
+    <li><div class="table"><div class="tablecell"><a href="#" class=""><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
+    <li><div class="table"><div class="tablecell"><a href="#" class=""><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
+    <li><div class="table"><div class="tablecell"><a href="#" class=""><i class="icon-cogs"></i>Settings</a></div></div></li>
 {% endblock %}
 
+{% block content %}
+    <div id="content-head-wrapper">
+    <div class="table" id="content-head-table-wrapper">
+        <div class="tablecell" id="pagename">
+            Quiz
+        </div>
+        <div class="tablecell" id="username">
+            <i class="icon-user"></i>{{username}}
+        </div>
+    </div></div>
+    <div class="table" id="question">
+        <div class="tablecell">
+            Please choose a category
+        </div>
+    </div>
+{% endblock %}

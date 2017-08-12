@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>tinyQuiz</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/reset.css') }}" />
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/base2.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome/css/font-awesome.min.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.js') }}"></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<div id="maincontainer">
+    <div id="contentwrapper">
+        <div id="contentcolumn">
+            <div class="innertube"><b>Content Column: <em>Fluid</em></b>
+            </div>
+        </div>
+    </div>
+    <div id="leftcolumn">
+        <div class="innertube"><b>Left Column: <em>200px</em></b>
+        </div>
+    </div>
+</div>
+<!-- need to find another way to disable overlay on page load -->
+<script>
+    $('#myOverlay').fadeOut();
+    function slideToggle() {
+        var x = document.getElementById('mySidebar');
+        if (x.style.left === '-70%'){
+            $('#mySidebar').animate({ left: '0'});
+            $('#myOverlay').fadeIn();
+        } else {
+            $('#mySidebar').animate({ left: '-70%'});
+            $('#myOverlay').fadeOut();
+        }
+    }
+</script>
+
+</body>
+</html>

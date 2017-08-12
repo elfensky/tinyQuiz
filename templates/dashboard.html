@@ -1,0 +1,99 @@
+{% extends "base1.html" %}
+
+{% block head %}
+<style>
+    .table{
+        height: 500px;
+        margin-top:-240px;
+    }
+
+    input{
+        padding: 12px 12px;
+        border: none;
+        border-radius: 10px;
+        background-color: #eee;
+        width: 275px;
+        margin-bottom: 1em;
+    }
+
+    #submit{
+        width: 300px;
+        background-color: #75AA28;
+        padding: 16px 12px;
+        color:white;
+        font-size:1em;
+    }
+
+    #submit:active {
+        background-color: green;
+    }
+
+    a{
+        background-color: #BB1041;
+        padding: 16px 123px;
+        color:white;
+        font-size:1em;
+        border-radius: 10px;
+    }
+    a:active{
+        background-color: darkred;
+    }
+
+    #dashboard{
+        background-color: white;
+        margin: 0px;
+        padding: 0px;
+        color:#FFF;
+        border-radius: 0px;
+    }
+
+    #middle{
+        position: relative;
+        top: -220px;
+        right: -165px;
+    }
+    #middle img{
+        background-color: lightgrey;
+    }
+    #middle img:hover{
+        background-color: grey;
+    }
+
+    #bottom{
+        top:-100px;
+    }
+</style>
+{% endblock %}
+
+{% block h2 %} You are logged in as: {{ username }} {% endblock %}
+
+{% block middle %}
+<a id="dashboard" href="{{url_for('quiz')}}">
+    <img style="width:50px;" src="{{ url_for('static', filename='img/return.png') }}" />
+</a>
+{% endblock %}
+
+{% block bottom %}
+    <form method="post">
+      <input type="password" name="password_old" placeholder="old password" value="{{request.form.password_old}}">
+      <br>
+      <input type="password" name="password1" placeholder="new password" value="{{request.form.password1}}">
+      <br>
+      <input type="password" name="password2" placeholder="repeat new password" value="{{request.form.password2}}">
+      <br>
+      <input id="submit" type="submit" value="Change password">
+    </form>
+    <br>
+    <a href="{{url_for('logout')}}">Log out</a>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes style="position: relative; top: -330px; color:red;">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+{% endblock %}
+

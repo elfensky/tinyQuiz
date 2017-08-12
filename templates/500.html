@@ -1,15 +1,28 @@
-{% extends "base.html" %}
+{% extends "base1.html" %}
+
+{% block head %}
+<style>
+        #bottom a:visited{
+        color:blue;
+    }
+</style>
+{%  endblock %}
 
 {% block h2 %} Error Page: 500 (internal server error) {% endblock %}
 
-{% block bottom %}
+{%  block middle %}
     <p style="width: 300px; margin:auto;">{{ e }}</p><br>
+{% endblock %}
+
+{% block bottom %}
     <p>
         Much server <br>
         Such internal <br>
         Very error <br>
         Wow
     </p>
+    <br><br>
+    <a style="" href="{{url_for('index')}}">Click here to return to login page</a>
 {% endblock %}
 
 

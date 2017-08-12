@@ -51,7 +51,7 @@ class mySQL:
         self.__cursor.close()
         return result
 
-    def setDataToDatabase(self, tableName, username, password):
+    def setLoginDataToDatabase(self, tableName, username, password):
         # Query met parameters
         # sqlQuery = "INSERT INTO {param1} ({param2}) VALUES ({param3})"
         sqlQuery = "INSERT INTO {param1} (username, password) VALUES (%s, %s)"

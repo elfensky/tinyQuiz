@@ -15,19 +15,16 @@ def login_required(f):
             return f(*args, **kwargs)
         else:
             flash("you need to login first")
-            return redirect(url_for('index'))
+            return redirect(url_for('login'))
     return wrap
 
-@app.route("/logout/")
-@login_required
-def logout():
-    session.clear()
-    flash("You have been logged out!")
-    gc.collect()
-    return redirect(url_for('index'))
-
-@app.route('/', methods=['GET','POST'])
+@app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/login/', methods=['GET','POST'])
+def login():
+    # session.clear()
     try:
         if request.method == "POST":
             attempted_username = request.form['username']
@@ -35,7 +32,6 @@ def index():
             password = hashing.hash_value(attempted_password, salt='6825')
 
             user = mySQL().getDataFromCustomRow('tblusers', 'username', attempted_username)
-
 
             if not user:
                 error="This user does not exist. Please try again."
@@ -51,13 +47,13 @@ def index():
                     flash(error)
 
         gc.collect()
-        return render_template("index.html")
+        return render_template("login.html")
 
     except Exception as e:
         error = "something went wrong: "
         flash(error + str(e))
 
-    return render_template('index.html')
+    return render_template('login.html')
 
 @app.route('/registration/', methods=['GET','POST'])
 def registration():
@@ -69,6 +65,7 @@ def registration():
             password = hashing.hash_value(attempted_password1, salt='6825')
 
             user = mySQL().getDataFromCustomRow('tblusers', 'username', attempted_username)
+
             if attempted_username == '':
                 error = "Please enter a username"
                 flash(error)
@@ -85,12 +82,13 @@ def registration():
                             error = "Passwords do not match."
                             flash(error)
                         else:
-                            session['logged_in'] = True
-                            session['username'] = attempted_username
-                            session['uid'] = user[0][0]
                             error = "you have successfully registered."
                             flash(error)
                             mySQL().setLoginDataToDatabase('tblusers', attempted_username, password)
+                            session['logged_in'] = True
+                            session['username'] = attempted_username
+                            user = mySQL().getDataFromCustomRow('tblusers', 'username', attempted_username)
+                            session['uid'] = str(user[0][0])
                             return redirect(url_for('quiz'))
         gc.collect()
         return render_template("registration.html")
@@ -99,7 +97,15 @@ def registration():
         error = "something went wrong: "
         flash(error + str(e))
 
-    return render_template('registration.html.html')
+    return render_template('registration.html')
+
+@app.route("/logout/")
+@login_required
+def logout():
+    session.clear() #on logout, cleal session cookies
+    flash("You have been logged out!")
+    gc.collect()
+    return redirect(url_for('index'))
 
 @app.route('/quiz/')
 @login_required
@@ -109,17 +115,24 @@ def quiz():
     print(session['uid'])
     dirty_category = mySQL().getDataFromCustomColumn('description', 'tblcategories')
     cleaned_category = [i[0] for i in dirty_category]
-    return render_template('quiz.html', tuple_category=cleaned_category)
+    return render_template('quiz.html', tuple_category=cleaned_category, username=session['username'])
+
+
+
+@app.route("/dashboard/")
+@login_required
+def dashboard():
+    return render_template('dashboard.html', username=session['username'])
 
 @app.errorhandler(403)
 def forbidden(e):
-    return render_template("403.html")
+    return render_template("403.html", e=e)
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template("404.html")
+    return render_template("404.html", e=e)
 @app.errorhandler(405)
 def method_not_found(e):
-    return render_template("405.html")
+    return render_template("405.html", e=e)
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template("500.html", e=e)

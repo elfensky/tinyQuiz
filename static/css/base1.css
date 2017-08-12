@@ -1,0 +1,162 @@
+/* general */
+body{
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 200;
+}
+#blur:before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    display: block;
+    background-image: url("../img/crowd.jpg");
+    filter: blur(5px) brightness(0.4);
+    background-size:cover;
+    width: 100vw;
+    height: 100vh;
+    /* removes white edges of blur by clipping */
+    transform: scale(1.1);
+}
+#wrapper{
+    width: 1150px;
+    height: 100vh;
+    margin: auto;
+}
+
+/* header */
+header{
+    /*background-color: green;*/
+    clear:both;
+    height: 60px;
+}
+header a{
+    font-size:1.25em;
+    color: rgba(255, 255, 255, 0.7);
+}
+header a:visited{
+    color: rgba(255, 255, 255, 0.7);
+}
+header a:hover{
+    color: rgba(255, 255, 255, 1);
+}
+#left{
+    float:left;
+    margin-left: 25px;
+}
+#right{
+    float:right;
+    margin-right: 25px;
+}
+.table{
+    height: 60px;
+    display: table;
+}
+.tablecell{
+    display: table-cell;
+    vertical-align: middle;
+}
+#logo{
+    height: 35px;
+}
+h1{
+    font-size: 1.5em;
+    margin-left:10px;
+}
+#signup{
+    font-weight:400;
+    margin-left:10px;
+    background-color: #58BC6B;
+    padding:10px;
+    border-radius: 10px;
+}
+
+/* content */
+#content{
+    height: 100%;
+    width: 100%;
+    /*display: table;*/
+}
+#dynamic{
+    position: relative;
+    display: inline-block;
+    background-color: rgba(29, 29, 29, .9);
+    border-radius: 10px;
+    padding: 60px 25px;
+    text-align: center;
+    left:50%;
+    margin-left:-160px;
+    margin-top:-60px; /* header height */
+    vertical-align: middle;
+    /*box-shadow: 0 0px 5px 1px rgba(255, 255, 255, 0.6);*/
+    color:white;
+}
+h2{
+    font-size:2em;
+    transform: translate(0px,-15px);
+}
+#flash{
+    position: absolute;
+    color:red;
+    font-weight: 400;
+    text-align: center;
+    left: 50%;
+    transform: translate(-50%, 1em);
+    width: 100%;
+    font-size:0.9em;
+}
+textarea, input, button { outline: none; } /* remove the stupid focus outline */
+input{
+    padding: 12px 12px;
+    border: none;
+    background-color: rgba(200, 200, 200, 0);
+    width: 275px;
+    margin-bottom: 1em;
+    border-bottom: 1px solid green;
+    color:white;
+        font-weight:200;
+
+}
+input:focus{
+    border: none;
+    background-color: rgba(20, 20, 20, 1);
+    border-bottom: 1px solid green;
+}
+#submit{
+    /*border-radius: 10px;*/
+    width: 300px;
+    background-color: #75AA28;
+    padding: 16px 12px;
+    font-weight: 400;
+    font-size:1.25em;
+}
+#submit:active{
+    background-color: green;
+}
+#blue{
+    transform: translate(0px,2.3em);
+    font-weight:200;
+}
+#blue a{
+    color:#CF3969;
+}
+#blue a:hover{
+    color:red;
+}
+#blue a.visited{
+    color:#CF3969;
+}
+
+
+/* footer */
+#footer{
+    height: 100px;
+    background-color: grey;
+}
+
+/* mobile */
+
+@media (max-width: 1150px), handheld{
+    #wrapper{
+        width: 100%;
+    }
+}

@@ -1,11 +1,25 @@
-{% extends "base.html" %}
+{% extends "base1.html" %}
+
+{% block head %}
+<style>
+        #bottom a:visited{
+        color:blue;
+    }
+</style>
+{%  endblock %}
 
 {% block h2 %} Error Page: 405 (method not allowed){% endblock %}
+
+{%  block middle %}
+    <p style="width: 300px; margin:auto;">{{ e }}</p><br>
+{% endblock %}
 
 {% block bottom %}
     <p>
         You can't do that, that's illegal!
     </p>
+    <br><br>
+    <a href="{{url_for('index')}}">Click here to return to login page</a>
 {% endblock %}
 
 

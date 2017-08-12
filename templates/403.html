@@ -1,9 +1,24 @@
-{% extends "base.html" %}
+{% extends "base1.html" %}
+
+{% block head %}
+<style>
+        #bottom a:visited{
+        color:blue;
+    }
+</style>
+{%  endblock %}
 
 {% block h2 %} Error Page: 403 (forbidden){% endblock %}
 
+{%  block middle %}
+    <p style="width: 300px; margin:auto;">{{ e }}</p><br>
+{% endblock %}
+
 {% block bottom %}
     <p>You. Shall. Not. Pass!</p>
+
+    <br>
+    <a href="{{url_for('index')}}">Click here to return to login page</a>
 {% endblock %}
 
 

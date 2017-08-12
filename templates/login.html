@@ -4,7 +4,7 @@
 <div class="table" style="width: 100%; height: 100%;">
 <div class="tablecell">
 <div id="dynamic">
-    <h2>Sign up</h2>
+    <h2>Login</h2>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <ul class=flashes" id="flash">
@@ -15,17 +15,15 @@
         {% endif %}
     {% endwith %}
 <br><br>
-    <form method="post">
+    <form method="POST">
       <input type="text" name="username" placeholder="username" value="{{request.form.username}}">
       <br>
-      <input type="password" name="password1" placeholder="password" value="{{request.form.password1}}">
+      <input id="password" type="password" name="password" placeholder="password" value="{{request.form.password}}">
       <br>
-      <input type="password" name="password2" placeholder="repeat password" value="{{request.form.password2}}">
-      <br>
-      <input id="submit" type="submit" value="Register">
+      <input id="submit" type="submit" value="Continue">
     </form>
 
-    <div id="blue"><a href="{{url_for('login')}}">Have an account? Log in</a></div>
+    <div id="blue"><a href="{{url_for('registration')}}">Don't have an account? Sign up</a></div>
 </div>
 </div>
 </div>
