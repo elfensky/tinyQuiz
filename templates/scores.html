@@ -1,0 +1,52 @@
+{% extends "base2.html" %}
+
+{% block slider %}
+    <ul>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('quiz') }}" class="active"><i class="icon-gamepad"></i>Play</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('settings') }}"><i class="icon-cog"></i>Settings</a></div></div></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <!-- HEADER -->
+    <div id="content-head-wrapper" style="height: 120px;">
+        <div class="table" id="content-head-table-wrapper" >
+            <div class="tablecell" id="pagename" style="height: 120px;">
+                Score
+            </div>
+        </div>
+    </div>
+    <!-- DYNAMIC/INTERACTIVE CONTENT -->
+    <div class="dynamic-wrapper">
+        <div class="table question">
+            <div class="tablecell">
+               You have earned {{correct}} points.
+            </div>
+
+        </div><div style="display:block;">
+                <canvas id="myChart"></canvas>
+            </div>
+    </div>
+{% endblock %}
+
+{% block chart %}
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['wins', 'losses'],
+        datasets: [{
+          label: 'points',
+          backgroundColor: ["#75AA28", "#BB1041"],
+          data: [{{correct}},{{wrong}}]
+        }]
+      },
+      options:{
+        responsive: false
+      }
+    });
+</script>
+{%  endblock  %}

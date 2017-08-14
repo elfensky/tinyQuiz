@@ -62,14 +62,35 @@ class mySQL:
         self.__connection.commit()
         self.__cursor.close()
 
+    def setScoreDataToDatabase(self, tableName, IDuser, IDcategory, correct, wrong, datetime):
+        sqlQuery = "INSERT INTO {param1} (IDuser, IDcategory, correct, wrong, datetime) VALUES (%s, %s, %s, %s, %s)"
+        sqlCommand = sqlQuery.format(param1=tableName)
+        # Combineren van de query en parameter
+        self.__cursor.execute(sqlCommand, (IDuser,IDcategory,correct,wrong,datetime))
+        self.__connection.commit()
+        self.__cursor.close()
 
+    # TEMPORARY FUNCTIONS
+    def getQuestionsByCategory(self, category):
+        # import random
+        # Query met parameters
+        sqlQuery = "SELECT * FROM tblquestions " \
+                   "JOIN tblcategories ON tblcategories.IDcategory = tblquestions.IDcategory " \
+                   "WHERE tblcategories.Description='{param1}'"
+        # Combineren van de query en parameter
+        sqlCommand = sqlQuery.format(param1=category)
 
-
-
-
-
-
-
+        # create cursor
+        self.__cursor = self.__connection.cursor()
+        #ADDED (dictionary=True) so I get dict results. Life is good now.
+        # use cursor
+        self.__cursor.execute(sqlCommand)
+        result = self.__cursor.fetchall()
+        # delete cursor
+        self.__cursor.close()
+        return result ##not needed anymore, shuffle order inside function.
+        # shuffled_result = random.sample(result, len(result))
+        # return shuffled_result
 
 
 

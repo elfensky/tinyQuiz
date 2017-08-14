@@ -1,12 +1,17 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, session
 from dbClass import mySQL
 from flask_hashing import Hashing
-# from passlib.hash import sha256_crypt #need to change the password system to use this instead
+import random
+from flask_wtf import Form
+from wtforms import TextField,SubmitField,PasswordField
 from functools import wraps #neccesary to have "login required" pages protected against access
 import gc #garbage collection to make sure stuff is cleaned up after mySQL stuff. Has mem leaks
+import time
 
 app = Flask(__name__)
 hashing = Hashing(app)
+print(time.strftime('%Y-%m-%d %H:%M:%S'))
+
 
 def login_required(f):
     @wraps(f)
@@ -53,7 +58,7 @@ def login():
         error = "something went wrong: "
         flash(error + str(e))
 
-    return render_template('login.html')
+    # return render_template('login.html')
 
 @app.route('/registration/', methods=['GET','POST'])
 def registration():
@@ -97,7 +102,7 @@ def registration():
         error = "something went wrong: "
         flash(error + str(e))
 
-    return render_template('registration.html')
+    # return render_template('registration.html')
 
 @app.route("/logout/")
 @login_required
@@ -106,6 +111,34 @@ def logout():
     flash("You have been logged out!")
     gc.collect()
     return redirect(url_for('index'))
+
+@app.route("/settings/", methods=['GET','POST'])
+@login_required
+def settings():
+    try:
+        if request.method == "POST":
+            attempted_password_old = request.form['password_old']
+            attempted_password1 = request.form['password1']
+            attempted_password2 = request.form['password2']
+            password = hashing.hash_value(attempted_password_old, salt='6825')
+
+            flash(attempted_password_old)
+            flash(attempted_password1)
+            flash(attempted_password2)
+            flash(password)
+
+        gc.collect()
+        return render_template('settings.html', username=session['username'])
+
+    except Exception as e:
+        flash(str(e))
+
+#GAME
+scores = ['0','0','0','0','0']
+trivia_clean_question = ['0']
+trivia_clean_types = ['0','0','0','0']
+trivia_clean_answers = ['0','0','0','0']
+trivia_clean_trivia = ['0']
 
 @app.route('/quiz/')
 @login_required
@@ -117,13 +150,98 @@ def quiz():
     cleaned_category = [i[0] for i in dirty_category]
     return render_template('quiz.html', tuple_category=cleaned_category, username=session['username'])
 
-
-
-@app.route("/dashboard/")
+@app.route('/quiz/<category>/<int:id>/')
 @login_required
-def dashboard():
-    return render_template('dashboard.html', username=session['username'])
+def category(category, id):
+    # -----------conditional returns----------- #
+    if id == 5:
+        correct = scores.count(1)
+        wrong = scores.count(0)
+        IDcategory = mySQL().getDataFromCustomRow('tblcategories','Description',category)
+        mySQL().setScoreDataToDatabase('tblscores', session['uid'], IDcategory[0][0], correct, wrong, time.strftime('%Y-%m-%d %H:%M:%S'))
+        return render_template('scores.html', correct=correct, wrong=wrong, username=session['username'])
 
+    else:
+        # -----------questions----------- #
+        questions = list(mySQL().getQuestionsByCategory(category))  # get question from db
+        # shuffled_questions = random.sample(questions, len(questions)) ##since I randomize on every call, I can't use this cuz I might get the same question twice.
+        clean_question = questions[id][1]  # get the question of the current page
+
+        # -----------answers----------- #
+        dirty_answers = []  # empty dict dirty answers
+        for x in range(0, 4):
+            dirty_answers.append(questions[id][2 + x])  # put the complete answers in it.
+        shuffled_answers = random.sample(dirty_answers, len(dirty_answers))  # shuffle their position in dict
+        clean_answers = [i.split(',')[0] for i in shuffled_answers]  # split into "before the ","
+        clean_types = [i.split(',')[1] for i in shuffled_answers]  # split into after the ","
+
+        # -----------global lists for trivia pages----------- #
+        trivia_clean_question[0] = clean_question
+        trivia_clean_trivia[0] = questions[id][6]
+        for x in range(0, 4):
+            trivia_clean_answers[x] = clean_answers[x]
+            trivia_clean_types[x] = clean_types[x]
+
+        # -----------return quiz----------- #
+        return render_template('questions.html',
+                                     category=category,
+                                     id=id,
+                                     clean_question=clean_question,
+                                     clean_types=clean_types,
+                                     clean_answers=clean_answers,
+                                     username=session['username'])
+
+@app.route('/quiz/<category>/<int:id>/<type>/')
+@login_required
+def trivia(category, id, type):
+    if id < 5:
+        if type == 'True':
+            scores[id] = 1  # add one to show you got a question correctly
+            return render_template('trivia_true.html',
+                                         category=category,
+                                         id=id,
+                                         clean_question=trivia_clean_question,
+                                         clean_answers=trivia_clean_answers,
+                                         clean_types=trivia_clean_types,
+                                         trivia_clean_trivia=trivia_clean_trivia,
+                                         username=session['username'])
+        else:
+            scores[id] = 0  # add zero to show you failed to answer correctly
+            return render_template('trivia_false.html',
+                                         category=category,
+                                         id=id,
+                                         clean_question=trivia_clean_question,
+                                         clean_answers=trivia_clean_answers,
+                                         clean_types=trivia_clean_types,
+                                         trivia_clean_trivia=trivia_clean_trivia,
+                                         username=session['username'])
+    else:
+        correct = scores.count(1)
+        wrong = scores.count(0)
+        return render_template('scores.html', correct=correct, wrong=wrong,username=session['username'])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ERRORS
 @app.errorhandler(403)
 def forbidden(e):
     return render_template("403.html", e=e)
@@ -137,8 +255,9 @@ def method_not_found(e):
 def internal_server_error(e):
     return render_template("500.html", e=e)
 
+# RUN
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.run()
+    app.run(threaded=True) #better performance, multiple clients
 

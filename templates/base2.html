@@ -5,25 +5,67 @@
     <title>tinyQuiz</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/reset.css') }}" />
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/base2.css') }}" />
+    <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/base2.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome/css/font-awesome.min.css') }}">
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/chart.js') }}"></script>
     {% block head %}{% endblock %}
 </head>
 <body>
+    <div id="content-wrapper">
+        <div id="content-column">
+            {% block content %}{% endblock %}
 
-<div id="maincontainer">
-    <div id="contentwrapper">
-        <div id="contentcolumn">
-            <div class="innertube"><b>Content Column: <em>Fluid</em></b>
+            <div id="content-head-wrapper" style="position: absolute;bottom: 0;">
+                <div class="table" id="content-head-table-wrapper">
+                    <div class="tablecell" id="info">
+                        <a href="#">Contact</a>
+                        <a href="#">Privacy</a>
+                        <a href="#">Legal</a>
+                    </div>
+                    <div class="tablecell" id="copyright">
+                        tinyQuiz™ | © 2017 Andrei Lavrenov. All Rights Reserved.
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div id="leftcolumn">
-        <div class="innertube"><b>Left Column: <em>200px</em></b>
+    <nav id="left-column">
+        <div id="branding-centering-wrapper">
+            <div class="table branding-wrapper">
+                <div class="tablecell" style="padding-left:50px;">
+                    <img id="logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                </div>
+                <div class="tablecell">
+                    <h1>tinyQuiz</h1>
+                </div>
+            </div>
+        </div>
+        {% block slider %}{% endblock %}
+{#        <div class="table" id="content-head-table-wrapper">#}
+{#            <div class="tablecell" id="info">#}
+{#                <a href="#">Contact</a>#}
+{#                <a href="#">Privacy</a>#}
+{#                <a href="#">Legal</a>#}
+{#            </div>#}
+{#        </div>#}
+    </nav>
+    <div id="rightcolumn">
+        <div class="table" id="content-head-table-wrapper">
+            <div class="tablecell" id="username">
+                <i class="icon-user"></i>{{username}}
+            </div>
+            <div class="tablecell" id="logout">
+                <a href="{{ url_for('logout') }}"><i class="icon-signout" style="margin-left: 1em;"></i>Logout</a>
+            </div>
+        </div>
+{#        <div style="width: 200px; margin: auto">#}
+{#            <canvas id="myChart" style="margin: 20px auto;"></canvas>#}
+{#        </div>#}
+        <div id="rightcolumn-content">
+            {% block stats %}{% endblock %}
         </div>
     </div>
-</div>
 <!-- need to find another way to disable overlay on page load -->
 <script>
     $('#myOverlay').fadeOut();
@@ -38,6 +80,26 @@
         }
     }
 </script>
+{% block chart %}
+{% endblock %}
+<script>
+    $(document).ready(function () {
+      setTimeout(function () {
 
+            $('a[href].no-link').each(function () {
+                var href = this.href;
+
+                $(this).removeAttr('href').css('cursor', 'pointer').click(function () {
+                    if (href.toLowerCase().indexOf("#") >= 0) {
+
+                    } else {
+                        window.open(href, '_self');
+                    }
+                });
+            });
+
+      }, 500);
+    });
+</script>
 </body>
 </html>

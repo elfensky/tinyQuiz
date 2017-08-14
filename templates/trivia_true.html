@@ -14,7 +14,7 @@
     <div id="content-head-wrapper" style="height: 120px;">
         <div class="table" id="content-head-table-wrapper" >
             <div class="tablecell" id="pagename" style="height: 120px;">
-                Quiz
+                Answer {{ id+1 }}
             </div>
         </div>
     </div>
@@ -22,48 +22,22 @@
     <div class="dynamic-wrapper">
         <div class="table question">
             <div class="tablecell">
-                Please choose the category which you want to play:
+                {{ clean_question[0] }}
             </div>
         </div>
         <div class="interactive">
-            {% for row in tuple_category %}
+            {% for x in range(0, 4) %}
                 <div class="divSquare">
-                    <a href="{{url_for('category', category=row, id=0)}}">
+                    <a class="no-link {{clean_types[x]}}"  href="#">
                         <div class="table selection-wrapper">
                             <div class="numbering tablecell">{{ loop.index }}</div>
-                            <div class="selection-value tablecell">{{ row }}</div>
+                            <div class="selection-value tablecell">{{ clean_answers[x] }}</div>
                         </div>
                     </a>
                 </div>
             {% endfor %}
+            <a id="correct" href="{{ url_for('category', category=category, id=id+1) }}">Correct! | Continue</a>
+            <br><br><p>{{ trivia_clean_trivia[0] }}</p>
         </div>
     </div>
 {% endblock %}
-
-{% block stats %}
-    <div class="percentage-wrapper table">
-        <div class="percentage">70%</div>
-        <div class="percentage-description">of people got this question right</div>
-    </div>
-{% endblock %}
-
-{% block chart %}
-{#<script>#}
-{#    var ctx = document.getElementById('myChart').getContext('2d');#}
-{#    var myChart = new Chart(ctx, {#}
-{#      type: 'doughnut',#}
-{#      data: {#}
-{#        labels: ['anime', 'books', 'Games', 'Movies'],#}
-{#        datasets: [{#}
-{#          label: 'Choises',#}
-{#          backgroundColor: ["#75AA28", "#BB1041", "#112233", "#332211"],#}
-{#          data: [10,33,53,22]#}
-{#        }]#}
-{#      },#}
-{#      options:{#}
-{#        responsive: true,#}
-{#        cutoutPercentage: 75#}
-{#      }#}
-{#    });#}
-{#</script>#}
-{%  endblock  %}
