@@ -2,21 +2,21 @@ class mySQL:
     def __init__(self):
         import mysql.connector as connector
 
-        # #login for db@pi
+        #login for db@pi
+        self.__dsn = {
+            "host": "localhost",
+            "user": "user",
+            "passwd": "password",
+            "db": "db_quiz"
+        }
+
+        # #login for db@laptop
         # self.__dsn = {
         #     "host": "localhost",
-        #     "user": "andrei",
+        #     "user": "root",
         #     "passwd": "admin",
         #     "db": "db_quiz"
         # }
-
-        #login for db@laptop
-        self.__dsn = {
-            "host": "localhost",
-            "user": "root",
-            "passwd": "admin",
-            "db": "db_quiz"
-        }
 
         self.__connection = connector.connect(**self.__dsn)
         self.__cursor = self.__connection.cursor() #ADDED (dictionary=True) so I get dict results. Life is good now.

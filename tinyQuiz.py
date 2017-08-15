@@ -325,9 +325,17 @@ def method_not_found(e):
 def internal_server_error(e):
     return render_template("500.html", e=e)
 
-# RUN
+# ----- RUN ----- #
+# if __name__ == '__main__':
+#     app.secret_key = 'super secret key'
+#     app.config['SESSION_TYPE'] = 'filesystem'
+#     app.run(threaded=True) #better performance, multiple clients
+
+# # -----------run for flask@pi----------- #
 if __name__ == '__main__':
+    import os
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.run(threaded=True) #better performance, multiple clients
-
+    port = int(os.environ.get("PORT",5050))
+    host = "0.0.0.0"
+    app.run(host=host, port=port, threaded=True)
