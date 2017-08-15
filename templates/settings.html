@@ -3,9 +3,9 @@
 {% block slider %}
     <ul>
         <li><div class="table"><div class="tablecell"><a href="{{ url_for('quiz') }}"><i class="icon-gamepad"></i>Play</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="{{ url_for('settings') }}" class="active" ><i class="icon-cog"></i>Settings</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('dashboard') }}"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('statistics') }}"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('settings') }}" class="active"><i class="icon-cog"></i>Settings</a></div></div></li>
     </ul>
 {% endblock %}
 
@@ -28,29 +28,40 @@
             </div>
         </div>
     </div>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes style="color:red;">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <div class="flash-wrapper">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes style="color:red;">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </div>
+    <div class="form-wrapper">
+        <form method="post">
+            <input type="password" name="password_old" placeholder="old password" value="{{request.form.password_old}}">
+            <br>
+            <input type="password" name="password1" placeholder="new password" value="{{request.form.password1}}">
+            <br>
+            <input type="password" name="password2" placeholder="repeat new password" value="{{request.form.password2}}"><br>
+            <input id="submit1" type="submit" value="Submit" style="width: 190px">
+        </form>
+    </div>
 
-    <form method="post">
-      <input type="password" name="password_old" placeholder="old password" value="{{request.form.password_old}}">
-      <br>
-      <input type="password" name="password1" placeholder="new password" value="{{request.form.password1}}">
-      <br>
-      <input type="password" name="password2" placeholder="repeat new password" value="{{request.form.password2}}"><br>
-      <input id="submit1" type="submit" value="Change password">
-    </form>
-    <form method="post">
-      <input type="text" name="username" placeholder="{{ username }}" value="{{request.form.username_new}}">
-      <br>
-      <input type="password" name="password3" placeholder="current password" value="{{request.form.password3}}"><br>
-      <input id="submit2" type="submit" value="Change username">
-    </form>
 {% endblock %}
 
+{% block stats %}
+    <div class="trivia-wrapper">
+        <p class="trivia">
+            tinyQuiz has been developed by Andrei Lavrenov in 2017 for Project I. It's based on flask and runs on a Raspberry Pi 3. It has a custom user system, score and data retention and more. You can find more information about the project on:
+            <br><br>
+            <a href="https://github.com/elfensky/tinyQuiz"><i class="icon-github"></i>Github</a>
+            <br><br>
+            <a href="https://www.instructables.com/id/TinyQuiz/"><i class="icon-book"></i>Intructables</a>
+            <br><br>
+            <a href="http://student.howest.be/andrei.lavrenov/portfolio/"><i class="icon-globe"></i>Portfolio</a>
+        </p>
+    </div>
+{% endblock %}

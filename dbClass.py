@@ -21,6 +21,7 @@ class mySQL:
         self.__connection = connector.connect(**self.__dsn)
         self.__cursor = self.__connection.cursor() #ADDED (dictionary=True) so I get dict results. Life is good now.
 
+    # ------ GET ------#
     def getDataFromCustomColumn(self, columnName, tableName):
         # Query met parameters
         sqlQuery = "SELECT {param1} FROM {param2}"
@@ -51,26 +52,6 @@ class mySQL:
         self.__cursor.close()
         return result
 
-    def setLoginDataToDatabase(self, tableName, username, password):
-        # Query met parameters
-        # sqlQuery = "INSERT INTO {param1} ({param2}) VALUES ({param3})"
-        sqlQuery = "INSERT INTO {param1} (username, password) VALUES (%s, %s)"
-        # Combineren van de query en parameter
-        sqlCommand = sqlQuery.format(param1=tableName)
-
-        self.__cursor.execute(sqlCommand, (username, password))
-        self.__connection.commit()
-        self.__cursor.close()
-
-    def setScoreDataToDatabase(self, tableName, IDuser, IDcategory, correct, wrong, datetime):
-        sqlQuery = "INSERT INTO {param1} (IDuser, IDcategory, correct, wrong, datetime) VALUES (%s, %s, %s, %s, %s)"
-        sqlCommand = sqlQuery.format(param1=tableName)
-        # Combineren van de query en parameter
-        self.__cursor.execute(sqlCommand, (IDuser,IDcategory,correct,wrong,datetime))
-        self.__connection.commit()
-        self.__cursor.close()
-
-    # TEMPORARY FUNCTIONS
     def getQuestionsByCategory(self, category):
         # import random
         # Query met parameters
@@ -91,6 +72,56 @@ class mySQL:
         return result ##not needed anymore, shuffle order inside function.
         # shuffled_result = random.sample(result, len(result))
         # return shuffled_result
+
+    def getCustomQuery(self, query):
+        # Query met parameters
+        sqlQuery = "{param1}"
+        # Combineren van de query en parameter
+        sqlCommand = sqlQuery.format(param1=query)
+
+        self.__cursor = self.__connection.cursor()
+        self.__cursor.execute(sqlCommand)
+        result = self.__cursor.fetchall()
+        self.__cursor.close()
+        return result
+
+    # ------ SET ------ #
+    def setLoginDataToDatabase(self, tableName, username, password):
+        # Query met parameters
+        # sqlQuery = "INSERT INTO {param1} ({param2}) VALUES ({param3})"
+        sqlQuery = "INSERT INTO {param1} (username, password) VALUES (%s, %s)"
+        # Combineren van de query en parameter
+        sqlCommand = sqlQuery.format(param1=tableName)
+
+        self.__cursor.execute(sqlCommand, (username, password))
+        self.__connection.commit()
+        self.__cursor.close()
+
+    def setScoreDataToDatabase(self, tableName, IDuser, IDcategory, IDquestion, answer, datetime):
+        sqlQuery = "INSERT INTO {param1} (IDuser, IDcategory, IDquestion, answer, datetime) VALUES (%s, %s, %s, %s, %s)"
+        sqlCommand = sqlQuery.format(param1=tableName)
+        # Combineren van de query en parameter
+        self.__cursor.execute(sqlCommand, (IDuser, IDcategory, IDquestion, answer, datetime))
+        self.__connection.commit()
+        self.__cursor.close()
+
+    def setGameDataToDatabase(self, tableName, IDuser, IDcategory, correct):
+        # Query met parameters
+        # sqlQuery = "INSERT INTO {param1} ({param2}) VALUES ({param3})"
+        sqlQuery = "INSERT INTO {param1} (IDuser, IDcategory, correct) VALUES (%s, %s, %s)"
+        # Combineren van de query en parameter
+        sqlCommand = sqlQuery.format(param1=tableName)
+
+        self.__cursor.execute(sqlCommand, (IDuser, IDcategory, correct))
+        self.__connection.commit()
+        self.__cursor.close()
+
+    def setCustomQuery(self, query):
+        sqlQuery = "{param1}"
+        sqlCommand = sqlQuery.format(param1=query)
+        self.__cursor.execute(sqlCommand)
+        self.__connection.commit()
+        self.__cursor.close()
 
 
 

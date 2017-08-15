@@ -3,8 +3,8 @@
 {% block slider %}
     <ul>
         <li><div class="table"><div class="tablecell"><a href="{{ url_for('quiz') }}" class="active"><i class="icon-gamepad"></i>Play</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('dashboard') }}"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('statistics') }}"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
         <li><div class="table"><div class="tablecell"><a href="{{ url_for('settings') }}"><i class="icon-cog"></i>Settings</a></div></div></li>
     </ul>
 {% endblock %}
@@ -27,8 +27,8 @@
         </div>
         <div class="interactive">
             {% for x in range(0, 4) %}
-                <div class="divSquare">
-                    <a class="no-link {{clean_types[x]}}"  href="#">
+                <div class="divSquare {{clean_types[x]}}">
+                    <a class="no-link"  href="#">
                         <div class="table selection-wrapper">
                             <div class="numbering tablecell">{{ loop.index }}</div>
                             <div class="selection-value tablecell">{{ clean_answers[x] }}</div>
@@ -37,7 +37,29 @@
                 </div>
             {% endfor %}
             <a id="correct" href="{{ url_for('category', category=category, id=id+1) }}">Wrong! | Continue</a>
-            <br><br><p>{{ trivia_clean_trivia[0] }}</p>
         </div>
+    </div>
+{% endblock %}
+
+{% block stats %}
+    <div class="percentage-wrapper table">
+        <div class="percentage">{{ percentage }}%</div>
+        <div class="percentage-description">of people got this question right</div>
+    </div>
+    <div class="trivia-wrapper">
+        <p class="trivia">
+            {{ trivia_clean_trivia[0] }}
+        </p>
+    </div>
+    <div class="trivia-wrapper">
+        <p class="trivia">
+            tinyQuiz has been developed by Andrei Lavrenov in 2017 for Project I. It's based on flask and runs on a Raspberry Pi 3. It has a custom user system, score and data retention and more. You can find more information about the project on:
+            <br><br>
+            <a href="https://github.com/elfensky/tinyQuiz"><i class="icon-github"></i>Github</a>
+            <br><br>
+            <a href="https://www.instructables.com/id/TinyQuiz/"><i class="icon-book"></i>Intructables</a>
+            <br><br>
+            <a href="http://student.howest.be/andrei.lavrenov/portfolio/"><i class="icon-globe"></i>Portfolio</a>
+        </p>
     </div>
 {% endblock %}

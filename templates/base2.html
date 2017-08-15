@@ -16,7 +16,7 @@
         <div id="content-column">
             {% block content %}{% endblock %}
 
-            <div id="content-head-wrapper" style="position: absolute;bottom: 0;">
+            <div id="content-bottom-wrapper">
                 <div class="table" id="content-head-table-wrapper">
                     <div class="tablecell" id="info">
                         <a href="#">Contact</a>
@@ -42,13 +42,7 @@
             </div>
         </div>
         {% block slider %}{% endblock %}
-{#        <div class="table" id="content-head-table-wrapper">#}
-{#            <div class="tablecell" id="info">#}
-{#                <a href="#">Contact</a>#}
-{#                <a href="#">Privacy</a>#}
-{#                <a href="#">Legal</a>#}
-{#            </div>#}
-{#        </div>#}
+
     </nav>
     <div id="rightcolumn">
         <div class="table" id="content-head-table-wrapper">
@@ -59,9 +53,6 @@
                 <a href="{{ url_for('logout') }}"><i class="icon-signout" style="margin-left: 1em;"></i>Logout</a>
             </div>
         </div>
-{#        <div style="width: 200px; margin: auto">#}
-{#            <canvas id="myChart" style="margin: 20px auto;"></canvas>#}
-{#        </div>#}
         <div id="rightcolumn-content">
             {% block stats %}{% endblock %}
         </div>

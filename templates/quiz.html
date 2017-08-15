@@ -3,8 +3,8 @@
 {% block slider %}
     <ul>
         <li><div class="table"><div class="tablecell"><a href="{{ url_for('quiz') }}" class="active"><i class="icon-gamepad"></i>Play</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('dashboard') }}"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('statistics') }}"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
         <li><div class="table"><div class="tablecell"><a href="{{ url_for('settings') }}"><i class="icon-cog"></i>Settings</a></div></div></li>
     </ul>
 {% endblock %}
@@ -41,29 +41,15 @@
 {% endblock %}
 
 {% block stats %}
-    <div class="percentage-wrapper table">
-        <div class="percentage">70%</div>
-        <div class="percentage-description">of people got this question right</div>
+    <div class="trivia-wrapper">
+        <p class="trivia">
+            tinyQuiz has been developed by Andrei Lavrenov in 2017 for Project I. It's based on flask and runs on a Raspberry Pi 3. It has a custom user system, score and data retention and more. You can find more information about the project on:
+            <br><br>
+            <a href="https://github.com/elfensky/tinyQuiz"><i class="icon-github"></i>Github</a>
+            <br><br>
+            <a href="https://www.instructables.com/id/TinyQuiz/"><i class="icon-book"></i>Intructables</a>
+            <br><br>
+            <a href="http://student.howest.be/andrei.lavrenov/portfolio/"><i class="icon-globe"></i>Portfolio</a>
+        </p>
     </div>
 {% endblock %}
-
-{% block chart %}
-{#<script>#}
-{#    var ctx = document.getElementById('myChart').getContext('2d');#}
-{#    var myChart = new Chart(ctx, {#}
-{#      type: 'doughnut',#}
-{#      data: {#}
-{#        labels: ['anime', 'books', 'Games', 'Movies'],#}
-{#        datasets: [{#}
-{#          label: 'Choises',#}
-{#          backgroundColor: ["#75AA28", "#BB1041", "#112233", "#332211"],#}
-{#          data: [10,33,53,22]#}
-{#        }]#}
-{#      },#}
-{#      options:{#}
-{#        responsive: true,#}
-{#        cutoutPercentage: 75#}
-{#      }#}
-{#    });#}
-{#</script>#}
-{%  endblock  %}

@@ -2,8 +2,6 @@ from flask import Flask, render_template, request, url_for, redirect, flash, ses
 from dbClass import mySQL
 from flask_hashing import Hashing
 import random
-from flask_wtf import Form
-from wtforms import TextField,SubmitField,PasswordField
 from functools import wraps #neccesary to have "login required" pages protected against access
 import gc #garbage collection to make sure stuff is cleaned up after mySQL stuff. Has mem leaks
 import time
@@ -11,8 +9,9 @@ import time
 app = Flask(__name__)
 hashing = Hashing(app)
 print(time.strftime('%Y-%m-%d %H:%M:%S'))
+print()
 
-
+# ----- GENERAL PAGES ----- #
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -108,7 +107,7 @@ def registration():
 @login_required
 def logout():
     session.clear() #on logout, cleal session cookies
-    flash("You have been logged out!")
+    # flash("You have been logged out!")
     gc.collect()
     return redirect(url_for('index'))
 
@@ -117,15 +116,27 @@ def logout():
 def settings():
     try:
         if request.method == "POST":
-            attempted_password_old = request.form['password_old']
+            attempted_password_old = hashing.hash_value(request.form['password_old'], salt='6825')
             attempted_password1 = request.form['password1']
             attempted_password2 = request.form['password2']
-            password = hashing.hash_value(attempted_password_old, salt='6825')
+            current_password = mySQL().getCustomQuery('SELECT password FROM tblusers WHERE IDuser='+str(session['uid']))
 
-            flash(attempted_password_old)
-            flash(attempted_password1)
-            flash(attempted_password2)
-            flash(password)
+            if attempted_password_old == '' or attempted_password1 == '' or attempted_password2 == '':
+                flash("Please completely fill out the form.")
+            else:
+                if attempted_password1 != attempted_password2:
+                    flash('New passwords do not match.')
+                    # return render_template('settings.html', username=session['username'])
+                else:
+                    if attempted_password_old == current_password[0][0]:
+                        flash('Your password has been changed.')
+                        new_password = hashing.hash_value(attempted_password1, salt='6825')
+                        mySQL().setCustomQuery('UPDATE tblusers SET password="'+str(new_password)+'" WHERE IDuser='+str(session['uid']))
+                        # print('UPDATE tblusers SET password="'+str(new_password)+'" WHERE IDuser='+str(session['uid']))
+                        # return render_template('settings.html', username=session['username'])
+                    else:
+                        flash('Old password does not match.')
+                        # return render_template('settings.html', username=session['username'])
 
         gc.collect()
         return render_template('settings.html', username=session['username'])
@@ -133,7 +144,7 @@ def settings():
     except Exception as e:
         flash(str(e))
 
-#GAME
+# ------- GAME -------- #
 scores = ['0','0','0','0','0']
 trivia_clean_question = ['0']
 trivia_clean_types = ['0','0','0','0']
@@ -143,9 +154,6 @@ trivia_clean_trivia = ['0']
 @app.route('/quiz/')
 @login_required
 def quiz():
-    print(session['logged_in'])
-    print(session['username'])
-    print(session['uid'])
     dirty_category = mySQL().getDataFromCustomColumn('description', 'tblcategories')
     cleaned_category = [i[0] for i in dirty_category]
     return render_template('quiz.html', tuple_category=cleaned_category, username=session['username'])
@@ -157,15 +165,16 @@ def category(category, id):
     if id == 5:
         correct = scores.count(1)
         wrong = scores.count(0)
-        IDcategory = mySQL().getDataFromCustomRow('tblcategories','Description',category)
-        mySQL().setScoreDataToDatabase('tblscores', session['uid'], IDcategory[0][0], correct, wrong, time.strftime('%Y-%m-%d %H:%M:%S'))
+        mySQL().setGameDataToDatabase('tblgames', session['uid'], session['cid'], correct)
         return render_template('scores.html', correct=correct, wrong=wrong, username=session['username'])
 
     else:
+        session['cid'] = mySQL().getCustomQuery("SELECT IDcategory FROM tblcategories WHERE description = '" + str(category) + "'")[0][0]
         # -----------questions----------- #
         questions = list(mySQL().getQuestionsByCategory(category))  # get question from db
         # shuffled_questions = random.sample(questions, len(questions)) ##since I randomize on every call, I can't use this cuz I might get the same question twice.
         clean_question = questions[id][1]  # get the question of the current page
+        session['qid'] = questions[id][0]
 
         # -----------answers----------- #
         dirty_answers = []  # empty dict dirty answers
@@ -181,7 +190,13 @@ def category(category, id):
         for x in range(0, 4):
             trivia_clean_answers[x] = clean_answers[x]
             trivia_clean_types[x] = clean_types[x]
-
+        # -----------statistics----------- #
+        stat1 = mySQL().getCustomQuery("SELECT answer FROM db_quiz.tblscores WHERE IDquestion = " + str(session['qid']))
+        cleaned_test = []
+        for i in range(0, len(stat1)):
+            cleaned_test.append(stat1[i][0])
+        percentage_dirty = str(100.0 / len(stat1) * cleaned_test.count(1))
+        session['percentage'] = percentage_dirty.split('.', 1)[0]
         # -----------return quiz----------- #
         return render_template('questions.html',
                                      category=category,
@@ -189,7 +204,8 @@ def category(category, id):
                                      clean_question=clean_question,
                                      clean_types=clean_types,
                                      clean_answers=clean_answers,
-                                     username=session['username'])
+                                     username=session['username'],
+                                     percentage=session['percentage'])
 
 @app.route('/quiz/<category>/<int:id>/<type>/')
 @login_required
@@ -197,6 +213,7 @@ def trivia(category, id, type):
     if id < 5:
         if type == 'True':
             scores[id] = 1  # add one to show you got a question correctly
+            mySQL().setScoreDataToDatabase('tblscores', session['uid'], session['cid'], session['qid'], '1', time.strftime('%Y-%m-%d %H:%M:%S'))
             return render_template('trivia_true.html',
                                          category=category,
                                          id=id,
@@ -204,9 +221,11 @@ def trivia(category, id, type):
                                          clean_answers=trivia_clean_answers,
                                          clean_types=trivia_clean_types,
                                          trivia_clean_trivia=trivia_clean_trivia,
-                                         username=session['username'])
+                                         username=session['username'],
+                                         percentage=session['percentage'])
         else:
             scores[id] = 0  # add zero to show you failed to answer correctly
+            mySQL().setScoreDataToDatabase('tblscores', session['uid'], session['cid'], session['qid'], '0',time.strftime('%Y-%m-%d %H:%M:%S'))
             return render_template('trivia_false.html',
                                          category=category,
                                          id=id,
@@ -214,34 +233,85 @@ def trivia(category, id, type):
                                          clean_answers=trivia_clean_answers,
                                          clean_types=trivia_clean_types,
                                          trivia_clean_trivia=trivia_clean_trivia,
-                                         username=session['username'])
+                                         username=session['username'],
+                                         percentage=session['percentage'])
     else:
         correct = scores.count(1)
         wrong = scores.count(0)
         return render_template('scores.html', correct=correct, wrong=wrong,username=session['username'])
 
+# ----------- STATISTICS ----------- #
+@app.route("/dashboard/")
+@login_required
+def dashboard():
+    # --- section 1 >> total games played by user ---#
+    played_games = mySQL().getCustomQuery('SELECT COUNT(*) FROM db_quiz.tblgames WHERE IDuser = '+str(session['uid']))
+    played_games_wins = mySQL().getCustomQuery('SELECT COUNT(*) FROM db_quiz.tblgames WHERE IDuser = '+str(session['uid'])+' AND correct >= 3')
+    while len(played_games) < 1:
+        played_games.append([0, 0])
+    while len(played_games_wins) < 1:
+        played_games_wins.append([0, 0])
+    # --- section 2 >> total points earned --- #
+    points = mySQL().getCustomQuery('SELECT SUM(correct) FROM db_quiz.tblgames WHERE IDuser = ' + str(session['uid']))
+    if points[0][0] == None:
+        points = [[0, 0]]
+    totalpoints = mySQL().getCustomQuery('SELECT COUNT(correct) FROM db_quiz.tblgames WHERE IDuser = ' + str(session['uid']))[0][0] * 5
+    # --- section 2 >> total points earned --- #
+    #somthing
+    # --- section 4 >> most played category ---#
+    category_id = mySQL().getCustomQuery('SELECT IDcategory , COUNT(IDcategory) AS MOST_FREQUENT FROM tblgames WHERE IDuser = '+str(session['uid'])+' GROUP BY IDcategory ORDER BY COUNT(IDcategory) DESC LIMIT 1')
+    while len(category_id) < 4:
+        category_id.append([0, 0])
+    category_times = mySQL().getCustomQuery('SELECT IDcategory , COUNT(IDcategory) AS MOST_FREQUENT FROM tblgames WHERE IDuser = '+str(session['uid'])+' GROUP BY IDcategory ORDER BY IDcategory')
+    while len(category_times) < 4:
+        category_times.append([0, 0])
+    category = mySQL().getCustomQuery('SELECT description FROM tblcategories WHERE IDcategory = ' + str(category_id[0][0]))
+    if not category:
+        category_fixed = 'not available'
+    else:
+        category_fixed = category[0][0]
+    return render_template('dashboard.html',
+                           username=session['username'],
+                           played_games=played_games[0][0],
+                           played_games_wins=played_games_wins[0][0],
+                           category_max_played=category_id,
+                           category_times_played=category_times,
+                           category=category_fixed,
+                           points=points[0][0],
+                           totalpoints=totalpoints)
+
+@app.route("/statistics/")
+@login_required
+def statistics():
+    # --- section 1 >> question most frequently answered wrong ---#
+    wrong_answer = mySQL().getCustomQuery('SELECT IDquestion, COUNT(IDquestion) AS MOST_FREQUENT FROM tblscores WHERE answer = 0 GROUP BY IDquestion ORDER BY COUNT(IDquestion) DESC LIMIT 1')
+    wrong_question = mySQL().getCustomQuery('SELECT * FROM tblquestions WHERE IDquestion =' + str(wrong_answer[0][0]))
+    wrong_category = mySQL().getCustomQuery('SELECT description FROM tblcategories WHERE IDcategory =' + str(wrong_question[0][7]))
+    # --- section 2 >> total points earned on server ---#
+    points = mySQL().getCustomQuery('SELECT SUM(correct) FROM db_quiz.tblgames')
+    totalpoints = mySQL().getCustomQuery('SELECT COUNT(correct) FROM db_quiz.tblgames')[0][0] * 5
+    # --- section 3 >> total games played on server ---#
+    played_games = mySQL().getCustomQuery('SELECT COUNT(*) FROM db_quiz.tblgames')
+    played_games_wins = mySQL().getCustomQuery('SELECT COUNT(*) FROM db_quiz.tblgames WHERE correct >= 3')
+    # --- section 4 >> most played category ---#
+    category_id = mySQL().getCustomQuery('SELECT IDcategory , COUNT(IDcategory) AS MOST_FREQUENT FROM tblgames GROUP BY IDcategory ORDER BY COUNT(IDcategory) DESC LIMIT 1')
+    category_times = mySQL().getCustomQuery('SELECT IDcategory , COUNT(IDcategory) AS MOST_FREQUENT FROM tblgames GROUP BY IDcategory ORDER BY IDcategory')
+    category = mySQL().getCustomQuery('SELECT description FROM tblcategories WHERE IDcategory = ' + str(category_id[0][0]))
+
+    return render_template('statistics.html',
+                           username=session['username'],
+                           wrong_question=wrong_question[0][1],
+                           wrong_category=wrong_category[0][0],
+                           points=points[0][0],
+                           totalpoints=totalpoints,
+                           played_games=played_games[0][0],
+                           played_games_wins=played_games_wins[0][0],
+                           category_max_played=category_id,
+                           category_times_played=category_times,
+                           category=category[0][0])
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ERRORS
+#------ ERRORS ------#
 @app.errorhandler(403)
 def forbidden(e):
     return render_template("403.html", e=e)

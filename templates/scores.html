@@ -3,8 +3,8 @@
 {% block slider %}
     <ul>
         <li><div class="table"><div class="tablecell"><a href="{{ url_for('quiz') }}" class="active"><i class="icon-gamepad"></i>Play</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
-        <li><div class="table"><div class="tablecell"><a href="#"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('dashboard') }}"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('statistics') }}"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
         <li><div class="table"><div class="tablecell"><a href="{{ url_for('settings') }}"><i class="icon-cog"></i>Settings</a></div></div></li>
     </ul>
 {% endblock %}
@@ -28,6 +28,9 @@
         </div><div style="display:block;">
                 <canvas id="myChart"></canvas>
             </div>
+    </div>
+    <div>
+        <a href="{{ url_for('quiz') }}">Click here to choose another category and play again</a>
     </div>
 {% endblock %}
 

@@ -1,0 +1,129 @@
+{% extends "base2.html" %}
+
+{% block head %}
+    <style>
+        @media (max-width: 1490px){
+            #content-bottom-wrapper{
+            position: relative;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block slider %}
+    <ul>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('quiz') }}"><i class="icon-gamepad"></i>Play</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('dashboard') }}"><i class="icon-dashboard"></i>Dashboard</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('statistics') }}" class="active"><i class="icon-bar-chart"></i>Statistics</a></div></div></li>
+        <li><div class="table"><div class="tablecell"><a href="{{ url_for('settings') }}"><i class="icon-cog"></i>Settings</a></div></div></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div id="content-head-wrapper" style="height: 120px;">
+        <div class="table" id="content-head-table-wrapper">
+            <div class="tablecell" id="pagename" style="height: 120px;">
+                Statistics
+            </div>
+        </div>
+    </div>
+    <div class="dynamic-wrapper">
+        <div class="table question">
+            <div class="tablecell">
+                Global game data:
+            </div>
+        </div>
+    </div>
+    <div class="flash-wrapper">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes style="color:red;">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </div>
+    <div class="stats-wrapp1er">
+        <div class="statbox">
+            <div class="stat">
+                People have played a total of <span class="bold">{{ played_games }}</span>  games.
+            </div>
+            <div class="stat">
+                <canvas id="played_games" class="stat-canvas"></canvas>
+                <script>
+                    var ctx = document.getElementById('played_games').getContext('2d');
+                    var losses = {{ played_games }} - {{ played_games_wins }};
+                    var played_games = new Chart(ctx, {
+                      type: 'pie',
+                      data: {
+                        labels: ['won', 'lost'],
+                        datasets: [{
+                          backgroundColor: ["#58BC6B", "#CF3969"],
+                          data: [{{played_games_wins}},losses]
+                        }]
+                      },
+                      options:{
+                        responsive: true,
+                        cutoutPercentage: 50,
+                        legend: {display: false}
+                      }
+                    });
+                </script>
+            </div>
+        </div>
+        <div class="statbox">
+            <div class="stat text-stat">
+                The question most often answered wrong is:
+                <span class="bold">{{ wrong_question }}</span>
+                from the category: <span class="bold">{{ wrong_category }}</span>
+            </div>
+        </div>
+        <div class="statbox">
+            <div class="stat text-stat">
+                People have earned a total of <span class="bold">{{ points }}</span> points on this server out of a possible <span class="bold">{{ totalpoints }}</span>.
+            </div>
+        </div>
+        <div class="statbox">
+            <div class="stat">
+                The most played category is <span class="bold">{{ category }}</span> with <span class="bold">{{ category_max_played[0][1] }}</span> times played.
+            </div>
+            <div class="stat">
+                <canvas id="played_category" class="stat-canvas"></canvas>
+                <script>
+                    var ctx = document.getElementById('played_category').getContext('2d');
+                    var played_category = new Chart(ctx, {
+                      type: 'bar',
+                      data: {
+                        labels: ['Anime', 'Books','Games','Movies'],
+                        datasets: [{
+                          label: 'Categories',
+                          backgroundColor: ["purple", "lightblue", "orange", "green"],
+                          data: [{{ category_times_played[0][1] }},{{ category_times_played[1][1] }},{{ category_times_played[2][1] }},{{ category_times_played[3][1] }}]
+                        }]
+                      },
+                      options:{
+                        responsive: true,
+                        legend:{display:false},
+                        scales: {yAxes: [{ticks: {display:false, beginAtZero: true}}]}}
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stats %}
+    <div class="trivia-wrapper">
+        <p class="trivia">
+            tinyQuiz has been developed by Andrei Lavrenov in 2017 for Project I. It's based on flask and runs on a Raspberry Pi 3. It has a custom user system, score and data retention and more. You can find more information about the project on:
+            <br><br>
+            <a href="https://github.com/elfensky/tinyQuiz"><i class="icon-github"></i>Github</a>
+            <br><br>
+            <a href="https://www.instructables.com/id/TinyQuiz/"><i class="icon-book"></i>Intructables</a>
+            <br><br>
+            <a href="http://student.howest.be/andrei.lavrenov/portfolio/"><i class="icon-globe"></i>Portfolio</a>
+        </p>
+    </div>
+{% endblock %}
