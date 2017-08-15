@@ -10,6 +10,8 @@ class mySQL:
             "db": "db_quiz"
         }
 
+        #follow the guide on instructables to import db onto the RPi
+
         # #login for db@laptop
         # self.__dsn = {
         #     "host": "localhost",
