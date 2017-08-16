@@ -336,6 +336,5 @@ if __name__ == '__main__':
     import os
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    port = int(os.environ.get("PORT",5050))
     host = "0.0.0.0"
-    app.run(host=host, port=port, threaded=True)
+    app.run(host=host, port=80, threaded=True)
